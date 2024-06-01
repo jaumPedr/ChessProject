@@ -9,11 +9,11 @@ Nomeando os espaços no tabuleiro
 Nomeando as peças
   As peças em jogo são relacionadas a uma letra, com exerção do peão;
 
-      K- Rei (King)
-      Q- Rainha (Queen)
-      B- Bispo (Bishop)
-      N- Cavalo (Knight)
-      R- Torre (Rook)
+   K- Rei (King)
+   Q- Rainha (Queen)
+   B- Bispo (Bishop)
+   N- Cavalo (Knight)
+   R- Torre (Rook)
 
 Nomeando Movimentos
   Durante a declaração de um movimento, é colocado a letra da peça na frente, exemplo: Ra5 (Torre move para a5).
