@@ -10,9 +10,13 @@ Nomeando as peças
   As peças em jogo são relacionadas a uma letra, com exerção do peão;
 
    K- Rei (King)
+   
    Q- Rainha (Queen)
+   
    B- Bispo (Bishop)
+   
    N- Cavalo (Knight)
+   
    R- Torre (Rook)
 
 Nomeando Movimentos
