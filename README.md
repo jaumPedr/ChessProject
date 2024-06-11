@@ -55,7 +55,9 @@ Pawn Promotion
 
 
 
-(Pt-Br)
+- (Pt-Br)
+
+
 Um simples simulador de uma partida de xadrez baseado em texto, feito usando linguagem java, o programa recebe notações de movimentos de xadrez e converte em ações no tabuleiro.
 
 Notação Algébrica do xadrez:
