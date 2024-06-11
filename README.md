@@ -47,8 +47,22 @@ Pawn Promotion
 
  -When the promotion is not declared the action does not occurs.
 
+Castling
 
+ -Special movement in chess that the king moves 2 spaces in direction of a unmoved rook and the Rook move to the space that the king skiped.
+ -Castling only occurs if the king and the rook have not been moved and if the positions between those two are unoccupied.
 
+ 0-0
+ -Notation to a king side castling.
+
+ 0-0-0
+ -Notation to a queen side castling.
+
+Check
+-The code will anounce if a check occors
+
+End game
+ -The game ends if a king is captured
 
 
 
