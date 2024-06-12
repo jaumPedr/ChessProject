@@ -1,4 +1,4 @@
-package GamesPieces;
+package GamePieces;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -6,11 +6,13 @@ import java.util.List;
 
 public class Pawn extends Piece{
 
-    int[] startPosition;
-    boolean enPessantTarget;
+    //Start position, equals the initialized position, it's used in "en pessant" analysis and in the double movement action
+    private int[] startPosition;
+    //True if is a "en pessant" target, false if it's not
+    private boolean enPessantTarget;
     public Pawn(int[] position, boolean isWhite) {
         super(position,isWhite);
-        startPosition=position;
+        startPosition=position.clone();
         enPessantTarget=false;
         this.typePiece="P";
     }
