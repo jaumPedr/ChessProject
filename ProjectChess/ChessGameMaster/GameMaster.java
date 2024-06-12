@@ -1,6 +1,6 @@
 package ChessGameMaster;
 
-import GamesPieces.*;
+import GamePieces.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;

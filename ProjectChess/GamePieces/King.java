@@ -1,4 +1,4 @@
-package GamesPieces;
+package GamePieces;
 
 import java.util.ArrayList;
 import java.util.List;
