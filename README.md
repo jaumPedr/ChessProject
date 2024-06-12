@@ -18,15 +18,15 @@ Namming the pieces
 
 Namming movements
 
- -During a movement declaration, is firstly used the piece letter, then the destination square, example: Ra5 (Rook to a5).
- -In a pawn move case, is used only the destination square, example: e4 (Pawn to e4).
+ - During a movement declaration, is firstly used the piece letter, then the destination square, example: Ra5 (Rook to a5).
+ - In a pawn move case, is used only the destination square, example: e4 (Pawn to e4).
 
 Captures
 
- -Durring a capture is declared a piece (or nothing if is a pawn), then is used the char 'x' and the captured position.
+ - Durring a capture is declared a piece (or nothing if is a pawn), then is used the char 'x' and the captured position.
  Example: Nxe4 (Knigth captures e4).
 
- -During a pawn capture, before the 'x' is declared the used pawn column. That occurs to disambiguate a pawn capture.
+ - During a pawn capture, before the 'x' is declared the used pawn column. That occurs to disambiguate a pawn capture.
  Example: exd5 (the pawn in the column 'e' captures the position d5).
 
  - En Pessant is a special chess move made against another pawn. It is similar to a pawn capture, but in the capture notation is used the position where the pawn will move.
@@ -34,116 +34,166 @@ Captures
 
 Redudant movement
 
- -When two or more pieces are able to make a move that is redundant, to disassemble a redundant move is used a column and/or row specification of the used piece.
+ - When two or more pieces are able to make a move that is redundant, to disassemble a redundant move is used a column and/or row specification of the used piece.
  Example: Two rooks can make the d4 capture, Rgxd4 (Rook in the 'g' column captures the d4 square); ; R5xd4 (Rook in the '5' row captures the d4 square); Rg5xd4 (Rook in the "g5" square 
  captures the d4 position).
 
- -Whe a action is redudant, the action is not made.
+ - Whe a action is redudant, the action is not made.
 
 Pawn Promotion
 
- -When a pawn reaches the extreme opposite row on the board, it is promoted. At the end of the notation it is declared which piece the pawn will promote.
+ - When a pawn reaches the extreme opposite row on the board, it is promoted. At the end of the notation it is declared which piece the pawn will promote.
  Example: e8Q (Pawn move to e8 and promotes to a Queen).
 
- -When the promotion is not declared the action does not occurs.
+ - When the promotion is not declared the action does not occurs.
 
 Castling
 
- -Special movement in chess that the king moves 2 spaces in direction of a unmoved rook and the Rook move to the space that the king skiped.
+ - Special movement in chess that the king moves 2 spaces in direction of a unmoved rook and the Rook move to the space that the king skiped.
  -Castling only occurs if the king and the rook have not been moved and if the positions between those two are unoccupied.
 
  0-0
- -Notation to a king side castling.
+ - Notation to a king side castling.
 
  0-0-0
- -Notation to a queen side castling.
+ - Notation to a queen side castling.
 
 Check
--The code will anounce if a check occors
+- The code will anounce if a check occors
 
 End game
- -The game ends if a king is captured
+ - The game ends if a king is captured
 
 
+Code:
+
+  Pakage GamePieces:
+
+  - Piece Class
 
 
-////////
+  Every piece extends the Piece class.
 
-- (Pt-Br)
+        //Every piece have a type
+        protected String typePiece;
+        //Every piece or is a white piece (isWhite) or is a black piece (!isWhite)
+        protected boolean isWhite;
+        //The piece position
+        protected int[] position;
+
+  Every piece have a diferent movement and capture pattern Overriding movement and possibleCaptureSpaces methods, the capture method is a possibility because is stil needed confirmation if the piece occupying the target square is a opposite color piece, that analysis is made in the GameMaster Class.
+
+    public abstract List<int[]> movement(List<int[]> occupiedSpaces);
+    public abstract List<int[]> possibleCaptureSpaces(List<int[]> occupiedSpaces);
+
+  Both movement and possibleCaptureSpaces uses a list of occupied Spaces, a movement is only valid if its destination is not a occupied square and a capture can be valid if the targeted space is occupied. The superClass Piece have the noOccupiedAnalysisSpace method, every subClass use noOccupiedAnalysisSpace in the moviment or capture method.
+
+    //true if the space is not occupied and false if is
+    public boolean noOccupiedAnalysisSpace(int[] analysisSpace, List<int[]> occupiedSpaces){
+        for(int i=0;i<occupiedSpaces.size();i++){
+            if(Arrays.equals(analysisSpace,occupiedSpaces.get(i))){
+                return false;
+            }
+        }
+        return true;
+    }
+
+- Pawn Class
+
+Uniques variables:
+
+    //Start position, equals the initialized position, it's used in "en pessant" analysis and in the double movement action
+    private int[] startPosition;
+    //True if is a en pessant target, false if it's not
+    private boolean enPessantTarget;
 
 
-Um simples simulador de uma partida de xadrez baseado em texto, feito usando linguagem java, o programa recebe notações de movimentos de xadrez e converte em ações no tabuleiro.
+movement method:
 
-Notação Algébrica do xadrez:
+A pawn movement is a white movement or a black movement, and a pawn movement can be a double movement if the pawn is in their starting position, every pawn only moves forward to the advesary side, moving normally one square and can be moved two squares if it's the first move.
 
-Nomeando os espaços no tabuleiro
+     public List<int[]> movement(List<int[]> occupiedSpaces){
+        List<int[]> movements= new ArrayList<>();
+        int[] newPosition;
 
- - Os espaços do xadrez são divididos em linhas enumeradas de 1-8 e colunas nomeadas de a-h, cada posição do tabuleiro é declarado por uma união {Letra,Numero}, exemplo: d6.
+        //Normal Movement
+        if(isWhite){
+            newPosition=position.clone();
+            newPosition[0]=newPosition[0]-1;
+            if(noOccupiedAnalysisSpace(newPosition,occupiedSpaces)){
+                movements.add(newPosition);
+            }
 
-Nomeando as peças
+            //First pawn movement (double space  movement)
+            if(Arrays.equals(startPosition,position)){
+                newPosition=position.clone();
+                newPosition[0]=newPosition[0]-2;
+                if(noOccupiedAnalysisSpace(newPosition,occupiedSpaces)){
+                    movements.add(newPosition);
+                }
+            }
+        }
+        else{
+            newPosition=position.clone();
+            newPosition[0]=newPosition[0]+1;
+            if(noOccupiedAnalysisSpace(newPosition,occupiedSpaces)){
+                movements.add(newPosition);
+            }
 
-  - As peças em jogo são relacionadas a uma letra, com exerção do peão;
+            //First pawn movement (double space  movement)
+            if(Arrays.equals(startPosition,position)){
+                newPosition=position.clone();
+                newPosition[0]=newPosition[0]+2;
+                if(noOccupiedAnalysisSpace(newPosition,occupiedSpaces)){
+                    movements.add(newPosition);
+                }
+            }
+        }
+        return movements;
+    }
 
-   - K- Rei (King)
+possibleCaptureSpaces method:
+
+
+A pawn capture is a white capture or a black capture, every pawn captures in the front diagonal, the front being the opposite board side, en pessant being a no-common move, it's not analyzed in that method, a "en pessant" analysis occurs in the GameMaster Class.
+
+    public List<int[]> possibleCaptureSpaces(List<int[]> occupiedSpaces){
+        List<int[]> possibleCaptureSpaces=new ArrayList<>();
+        int[] possibleCapture;
+        possibleCapture=position.clone();
+        if(isWhite) {
+
+            possibleCapture[0]=possibleCapture[0]-1;
+            possibleCapture[1]=possibleCapture[1]-1;
+            if (!noOccupiedAnalysisSpace(possibleCapture,occupiedSpaces)){
+                possibleCaptureSpaces.add(possibleCapture);
+            }
+
+            possibleCapture=position.clone();
+            possibleCapture[0]=possibleCapture[0]-1;
+            possibleCapture[1]=possibleCapture[1]+1;
+            if (!noOccupiedAnalysisSpace(possibleCapture,occupiedSpaces)){
+                possibleCaptureSpaces.add(possibleCapture);
+            }
+
+            possibleCapture=position.clone();
+            possibleCapture[0]=possibleCapture[0]-1;
+            return possibleCaptureSpaces;
+        }else {
+            possibleCapture[0]=possibleCapture[0]+1;
+            possibleCapture[1]=possibleCapture[1]+1;
+            if (!noOccupiedAnalysisSpace(possibleCapture,occupiedSpaces)){
+                possibleCaptureSpaces.add(possibleCapture);
+            }
+            possibleCapture=position.clone();
+            possibleCapture[0]=possibleCapture[0]+1;
+            possibleCapture[1]=possibleCapture[1]-1;
+            if (!noOccupiedAnalysisSpace(possibleCapture,occupiedSpaces)){
+                possibleCaptureSpaces.add(possibleCapture);
+            }
+            return possibleCaptureSpaces;
+        }
+
+    }
    
-   - Q- Rainha (Queen)
-   
-   - B- Bispo (Bishop)
-   
-   - N- Cavalo (Knight)
-   
-   - R- Torre (Rook)
-
-Nomeando Movimentos
-
-  - Durante a declaração de um movimento, é colocado a letra da peça na frente, exemplo: Ra5 (Torre move para a5).
-  - Caso seja movido um peão, não é colocado nada antes da declaração do movimento, exemplo: a4 (Peão se move para a4)
-
-Capturas
-
- - Durante uma captura é declarado a peça (ou nada no caso do peão), é posto a letra 'x' e a posição na qual a peça fará a captura
-   Exemplo: Nxe4 (Cavalo captura perça em e4)
-
-  - Durante a captura com peões, deve-se antes do 'x' declarar qual coluna do peão usado para a captura, diferente do movimento de peões, na captura pode ocorrer redundância, por isso
-  é declarado a especificação da coluna na qual o peão está.
-  Exemplo: exd5 (peão na coluna 'e' captura peça na posição d5)
-
-  - En Pessant é uma captura especial que o peão pode realizar contra outro peão, na declaração do en pessant devese por a posição na qual o peão ira se mover e não da peça capturada
-  Exemplo: exd6 (Como sabemos que isso se trata de um en pessant, peão na coluna e, captura peão adversário e se move para d6)
-
-Redundância de Movimentos
-
-  - Quando há dois ou mais possíveis peças para executar um movimento ou captura é posto logo após a letra da peça uma especificação de qual coluna ou linha (podendo usar ambas se necessárrio)
-Exemplo: Caso 2 ou mais torres possam realizar a captura em d4, Rgxd4 (Torre na coluna g realizando a captura); R5xd4 (Torre na linha 5 realizando a captura); Rg5xd4 (Torre em g5 fazendo a captura)
-  
-  - A ação da peça não ocorre caso haja redundância na notação.
-
-Promoção de  peão 
-
-  - Ao chegar no extremo oposto do tabuleiro, o peão é promovido a outra peça, após a ação que levou à promoção do peão, é posto a letra de qual peça ele ira se tornar
-  Exemplo: e8Q (Peão se move para e8 e vira uma Rainha); dxe8Q (Peão na coluna d, captura e8 e se torna uma rainha)
-
-  - Caso não seja posto a peça que o peão é promovido, a ação não ocorre.
-
-"Roque"
-
-  - Movimento especial no xadrez no qual o rei anda duas casas em direção a uma das torres e a torre equivalente se move até a posição que o rei pulou.
-  - Esse movimento só ocorre se o rei n tiver se movido, nem a torre escolhida para o movimento, o rei não esteja em check, e não haja peças entre o rei e a torre.
-
-  0-0
-  
-  -Notação para o roque no lado do rei
-
-  0-0-0 
-  
-  - Notação para o roque no lado da rainha
-
-Check
-
-  - O programa avisa quando é feito check contra o advesário
-
-Fim de Jogo
-
-  - O programa encerra o jogo quando um dos reis é capturado
-
 
